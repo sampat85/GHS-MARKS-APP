@@ -47,6 +47,45 @@
 <section id="reports" class="pane hidden"><div class="card"><h2 class="title">Report cards & consolidated results</h2><div class="row"><div><label>Student</label><select id="reportStudent" onchange="renderReport()"></select></div><div><label>View</label><select id="reportMode" onchange="renderReport()"><option value="individual">Individual report card</option><option value="consolidated">Consolidated class results</option></select></div></div><button style="margin-top:10px" onclick="window.print()">Print / Save PDF</button></div><div class="card" id="reportContent"></div></section>
 <section id="data" class="pane hidden"><div class="card"><h2 class="title">Excel import / export</h2><p class="muted">Import your original workbook to sync student roster and recognized marks, or export current cloud data to Excel.</p><label>Choose .xlsx or .json backup</label><input id="importFile" type="file" accept=".xlsx,.xls,.json"><div class="row" style="margin-top:10px"><button onclick="importFile()">Import into database</button><button class="secondary" onclick="exportXlsx()">Export Excel workbook</button><button class="secondary" onclick="exportJson()">Export JSON backup</button></div><p id="dataMsg" class="muted"></p><div class="notice">Import writes changes to the shared database. Export a backup first. Only authenticated teachers can access records.</div></div></section></main></div>
 <script>
+  <section id="login" class="card">
+  <h2 class="title">Teacher Sign In / Register</h2>
+  <p class="muted">Sign in to your account or register as a new teacher.</p>
+  
+  <!-- Login / Register Form -->
+  <div id="authFormSection">
+    <div class="row">
+      <div>
+        <label>Email</label>
+        <input id="email" type="email" autocomplete="username" placeholder="teacher@school.in">
+      </div>
+      <div>
+        <label>Password</label>
+        <input id="password" type="password" autocomplete="current-password">
+      </div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button id="loginBtn" onclick="signIn()">Sign In (Existing User)</button>
+      <button class="secondary" onclick="registerUser()">Register (New User)</button>
+    </div>
+  </div>
+
+  <!-- Hidden OTP Verification Form -->
+  <div id="otpSection" class="hidden" style="margin-top: 15px; padding: 10px; background: #eef2f9; border-radius: 8px;">
+    <h3 style="margin-top: 0;">Verify Your Email</h3>
+    <div class="row">
+      <div>
+        <label>Check your email and enter the 6-digit OTP:</label>
+        <input id="otpCode" type="number" placeholder="123456">
+      </div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button onclick="verifyOTP()">Verify OTP & Login</button>
+      <button class="secondary" onclick="cancelOTP()">Cancel</button>
+    </div>
+  </div>
+
+  <p id="loginMsg" class="muted" style="margin-top: 15px; font-weight: bold;"></p>
+</section>
 const ASSESS={FA1:{labels:['Activity 1','Activity 2','SA / component'],max:[15,15,20],kind:'FA'},FA2:{labels:['Activity 3','Activity 4','SA / component'],max:[15,15,20],kind:'FA'},FA3:{labels:['Activity 1','Activity 2','SA / component'],max:[15,15,20],kind:'FA'},FA4:{labels:['Activity 3','Activity 4','SA / component'],max:[15,15,20],kind:'FA'},SA1:{labels:['Theory','Practical','IA'],max:[30,50,20],kind:'SA'},SA2:{labels:['Theory','Practical','IA'],max:[30,50,20],kind:'SA'}};
 let sb,students=[],marks={},gradeFA=[],gradeSA=[],user;
 function el(id){return document.getElementById(id)}function esc(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function grade(t,k){if(t===null||t===undefined)return '—';let arr=k==='FA'?gradeFA:gradeSA;let g='NA';for(const r of arr)if(Number(t)>=Number(r.min_score))g=r.grade;return g}function getVals(roll,a){return marks[roll+'|'+a]||{component1:null,component2:null,component3:null}}function total(roll,a){let v=getVals(roll,a),arr=[v.component1,v.component2,v.component3];if(arr.every(x=>x===null||x===undefined||x===''))return null;return arr.reduce((n,x)=>n+(x===null||x===''||x===undefined?0:Number(x)),0)}
