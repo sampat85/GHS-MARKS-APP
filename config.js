@@ -1,3 +1,4 @@
-window.SUPABASE_URL = "https://fqwzbpgpikzkeqtwxfoc.supabase.co";
-window.SUPABASE_KEY = "sb_publishable_Y5gXnGqP25_yyeE1jNEplQ_lcUM4H3p";
-//force update
+window.GHS_SUPABASE_CONFIG = {
+    supabaseUrl: "https://fqwzbpgpikzkeqtwxfoc.supabase.co",
+    anonKey: "sb_publishable_Y5gXnGqP25_yyeE1jNEplQ_lcUM4H3p"
+};
